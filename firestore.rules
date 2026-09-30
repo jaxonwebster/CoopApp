@@ -1,0 +1,115 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function hasProfile() { return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)); }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function myHousehold() { return me().householdId; }
+    function isParent() { return hasProfile() && me().role == 'parent'; }
+    function sameHousehold(id) { return hasProfile() && myHousehold() == id; }
+    function parentIn(id) { return isParent() && myHousehold() == id; }
+
+    match /users/{userId} {
+      allow create: if signedIn() && request.auth.uid == userId;
+      allow read: if signedIn() && (request.auth.uid == userId || (hasProfile() && sameHousehold(resource.data.householdId)));
+      allow update: if signedIn() && (parentIn(resource.data.householdId)
+        || (request.auth.uid == userId
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAvailable','sickUntil'])));
+      allow delete: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /households/{householdId} {
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow read: if sameHousehold(householdId);
+      allow update, delete: if parentIn(householdId);
+    }
+
+    match /householdCodes/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.createdBy == request.auth.uid;
+    }
+
+    match /chores/{choreId} {
+      allow create: if (isParent() && request.resource.data.householdId == myHousehold())
+        || (hasProfile()
+          && request.resource.data.householdId == myHousehold()
+          && request.resource.data.source == 'optionalClaim'
+          && request.resource.data.claimedFromOptional == true
+          && request.resource.data.assignedTo == request.auth.uid
+          && request.resource.data.openToAnyone == false
+          && request.resource.data.recurring == false);
+      allow read: if sameHousehold(resource.data.householdId);
+      allow update: if (parentIn(resource.data.householdId)
+        && resource.data.source != 'optionalClaim')
+        || (parentIn(resource.data.householdId)
+          && resource.data.recurring == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'skippedDates','recurrenceEndDate','updatedAt'
+          ]))
+        || (sameHousehold(resource.data.householdId) && resource.data.assignedTo == request.auth.uid)
+        || (sameHousehold(resource.data.householdId)
+          && resource.data.openToAnyone == true
+          && resource.data.assignedTo == null
+          && request.resource.data.assignedTo == request.auth.uid
+          && request.resource.data.openToAnyone == false
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'assignedTo','assignedToName','assignedToRole','openToAnyone','originallyAvailable','claimedFromOptional','updatedAt'
+          ]))
+        || (parentIn(resource.data.householdId)
+          && resource.data.source == 'optionalClaim'
+          && request.resource.data.assignedTo == resource.data.assignedTo
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'status','rejectionNote','proofPhotoUrl','submittedAt','approvedAt','completedAt','updatedAt'
+          ]));
+      allow delete: if parentIn(resource.data.householdId);
+    }
+
+    match /rewards/{rewardId} {
+      allow create: if isParent() && request.resource.data.householdId == myHousehold();
+      allow read: if sameHousehold(resource.data.householdId);
+      allow update, delete: if parentIn(resource.data.householdId);
+    }
+
+    match /redemptions/{redemptionId} {
+      allow read: if hasProfile() && sameHousehold(resource.data.householdId);
+      allow create: if hasProfile()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.householdId == myHousehold();
+      allow update, delete: if parentIn(resource.data.householdId);
+    }
+
+    match /rewardClaims/{claimId} {
+      allow read: if hasProfile() && sameHousehold(resource.data.householdId);
+      allow create: if hasProfile()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.householdId == myHousehold();
+      allow delete: if parentIn(resource.data.householdId);
+      allow update: if false;
+    }
+
+    match /contributions/{contributionId} {
+      allow create: if hasProfile()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.householdId == myHousehold()
+        && request.resource.data.rewardId is string
+        && request.resource.data.amount is int
+        && request.resource.data.amount > 0
+        && request.resource.data.keys().hasOnly(['householdId','rewardId','userId','amount','createdAt']);
+      allow read: if sameHousehold(resource.data.householdId);
+      allow update, delete: if false;
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if signedIn() && resource.data.recipientId == request.auth.uid;
+      allow create: if hasProfile()
+        && request.resource.data.householdId == myHousehold()
+        && request.resource.data.type == 'patOnBack'
+        && request.resource.data.senderId == request.auth.uid
+        && request.resource.data.recipientId is string
+        && get(/databases/$(database)/documents/users/$(request.resource.data.recipientId)).data.householdId == myHousehold();
+      allow update: if signedIn() && resource.data.recipientId == request.auth.uid;
+      allow delete: if signedIn() && resource.data.recipientId == request.auth.uid;
+    }
+  }
+}

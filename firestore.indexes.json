@@ -1,0 +1,29 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "chores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "householdId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "chores",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "householdId", "order": "ASCENDING" },
+        { "fieldPath": "assignedTo", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "recipientId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
