@@ -51,12 +51,13 @@ export async function requestNotificationPermission() {
     return true;
   }
 
-  const result =
-    await requestPermissionsAsync({
-      allowAlert: true,
-      allowBadge: true,
-      allowSound: true,
-    });
+  const result = await requestPermissionsAsync({
+  ios: {
+    allowAlert: true,
+    allowBadge: true,
+    allowSound: true,
+  },
+});
 
   return result.granted;
 }
