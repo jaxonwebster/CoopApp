@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "Coop Navigation Assignment",
+    "slug": "coop-navigation-assignment",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light"
+  }
+}

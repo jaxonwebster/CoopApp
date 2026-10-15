@@ -1,0 +1,97 @@
+[
+  {
+    "route": "Login",
+    "title": "Welcome to Coop",
+    "file": "LoginScreen.js"
+  },
+  {
+    "route": "ChooseAccountType",
+    "title": "Choose Account Type",
+    "file": "ChooseAccountTypeScreen.js"
+  },
+  {
+    "route": "Register",
+    "title": "Create Your Account",
+    "file": "RegisterScreen.js"
+  },
+  {
+    "route": "Home",
+    "title": "Home Dashboard",
+    "file": "HomeScreen.js"
+  },
+  {
+    "route": "MyChores",
+    "title": "My Chores",
+    "file": "MyChoresScreen.js"
+  },
+  {
+    "route": "ChoreDetail",
+    "title": "Chore Details",
+    "file": "ChoreDetailScreen.js"
+  },
+  {
+    "route": "ChoreForm",
+    "title": "Create or Edit Chore",
+    "file": "ChoreFormScreen.js"
+  },
+  {
+    "route": "Approvals",
+    "title": "Chore Approvals",
+    "file": "ApprovalsScreen.js"
+  },
+  {
+    "route": "MissedChores",
+    "title": "Missed Chores",
+    "file": "MissedChoresScreen.js"
+  },
+  {
+    "route": "Rewards",
+    "title": "Family Rewards",
+    "file": "RewardsScreen.js"
+  },
+  {
+    "route": "RewardForm",
+    "title": "Create or Edit Reward",
+    "file": "RewardFormScreen.js"
+  },
+  {
+    "route": "CurrentRewards",
+    "title": "Active Rewards",
+    "file": "CurrentRewardsScreen.js"
+  },
+  {
+    "route": "HomeReset",
+    "title": "Quick Cleanup",
+    "file": "HomeResetScreen.js"
+  },
+  {
+    "route": "Family",
+    "title": "Family",
+    "file": "FamilyScreen.js"
+  },
+  {
+    "route": "MemberProfile",
+    "title": "Family Member",
+    "file": "MemberProfileScreen.js"
+  },
+  {
+    "route": "Profile",
+    "title": "Profile & History",
+    "file": "ProfileScreen.js"
+  },
+  {
+    "route": "ProfileEdit",
+    "title": "Edit Profile",
+    "file": "ProfileEditScreen.js"
+  },
+  {
+    "route": "NotificationSettings",
+    "title": "Notification Settings",
+    "file": "NotificationSettingsScreen.js"
+  },
+  {
+    "route": "LegalInfo",
+    "title": "Privacy & Legal",
+    "file": "LegalInfoScreen.js"
+  }
+]
